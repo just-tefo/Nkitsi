@@ -1,11 +1,10 @@
 import * as React from "react";
 import 'react-native-get-random-values';
 
-// Import and configure Amplify BEFORE any Auth usage
 import "../../amplifyConfig";
 import { Auth } from 'aws-amplify';
-// Hub can be imported from 'aws-amplify' (exports Hub) — use that to stay consistent
-import { Hub } from 'aws-amplify';
+// Hub can be imported from '@aws-amplify/core' in some installations — this is more robust
+import { Hub } from '@aws-amplify/core';
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import SplashScreen from "./screens/splashScreen";
@@ -13,13 +12,10 @@ import Login from "./screens/login";
 import Signup from "./screens/signup";
 import ForgotPassword from "./screens/forgotPassword";
 import PasswordResetConfirmation from "./screens/passwordResetConfirmation";
-import ConfirmSignup from "./screens/confirmSignup";
 import Homepage from "../mobile/screens/homepage";
 import MyAccountScreen from "./screens/myAccountScreen";
 import DocumentsScreen from "./screens/documentScreen";
 import AddDocumentScreen from "./screens/addDocument";
-import NetworkScreen from "./screens/networkScreen";
-import CompanyDetails from "./screens/companyDetails";
 import { navigationRef, navigate } from "./services/navigationService";
 import Header from "./components/header";
 import Sidebar from "./components/sidebar";
@@ -100,13 +96,8 @@ export default function App() {
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      {/* Only render persistent chrome when we know the current route and it's not Login/Signup */}
-      {currentRoute && !['Login', 'Signup'].includes(currentRoute) && (
-        <>
-          <Header onProfileClick={toggleSidebar} onNotificationClick={handleNotificationClick} hasNotifications={hasNotifications} />
-          <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
-        </>
-      )}
+      <Header onProfileClick={toggleSidebar} onNotificationClick={handleNotificationClick} hasNotifications={hasNotifications} />
+      <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
       <NavigationContainer
         ref={navigationRef}
         onReady={() => {
@@ -125,21 +116,17 @@ export default function App() {
           <Stack.Screen name="Splash" component={SplashScreen} />
           <Stack.Screen name="Login" component={Login} />
           <Stack.Screen name="Signup" component={Signup} />
-          <Stack.Screen name="ConfirmSignup" component={ConfirmSignup} />
           <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
           <Stack.Screen name="PasswordResetConfirmation" component={PasswordResetConfirmation} />
           <Stack.Screen name="Homepage" component={Homepage} />
           <Stack.Screen name="MyAccount" component={MyAccountScreen} options={{ headerShown: true, title: "My Account" }} />
           <Stack.Screen name="Documents" component={DocumentsScreen} />
           <Stack.Screen name="AddDocument" component={AddDocumentScreen} />
-          <Stack.Screen name="Network" component={NetworkScreen} />
-          <Stack.Screen name="CompanyDetails" component={CompanyDetails} />
         </Stack.Navigator>
       </NavigationContainer>
 
-      {/* Persistent FAB (hidden on Login/Signup) */}
-      {currentRoute && !['Login', 'Signup'].includes(currentRoute) && (
-        <TouchableOpacity
+      {/* Persistent FAB */}
+      <TouchableOpacity
         style={{
           position: 'absolute',
           bottom: 80,
@@ -161,29 +148,26 @@ export default function App() {
         }}
       >
         <Ionicons name={currentRoute === 'Documents' ? 'add' : 'share-outline'} size={24} color="#fff" />
-        </TouchableOpacity>
-      )}
+      </TouchableOpacity>
 
-      {/* Persistent bottom navbar (hidden on Login/Signup) */}
-      {currentRoute && !['Login', 'Signup'].includes(currentRoute) && (
-        <NavBar
-          activeTab={activeTab}
-          onNavigate={(tabId) => {
-            setActiveTab(tabId);
-            switch (tabId) {
-              case 'home':
-                navigate('Homepage', { tab: 'home' });
-                break;
-              case 'documents':
-                navigate('Documents');
-                break;
-              case 'network':
-                navigate('Network');
-                break;
-            }
-          }}
-        />
-      )}
+      {/* Persistent bottom navbar */}
+      <NavBar
+        activeTab={activeTab}
+        onNavigate={(tabId) => {
+          setActiveTab(tabId);
+          switch (tabId) {
+            case 'home':
+              navigate('Homepage', { tab: 'home' });
+              break;
+            case 'documents':
+              navigate('Documents');
+              break;
+            case 'network':
+              navigate('Homepage', { tab: 'network' });
+              break;
+          }
+        }}
+      />
     </SafeAreaView>
   );
 }

@@ -13,11 +13,10 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
-import { Auth } from "aws-amplify";
-import { loginUser } from "../controllers/authControllers";
+import { Auth } from "@aws-amplify/auth";
 
 // debug: log Auth availability at runtime
-console.log('Auth (login.js) imported from aws-amplify:', Auth);
+console.log('Auth (login.js) imported from @aws-amplify/auth:', Auth);
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -27,19 +26,12 @@ const Login = ({ navigation }) => {
 
   const handleLogin = async () => {
     try {
-      // Use email/password sign-in only (no Hosted UI)
-      if (!email || !password) {
-        Alert.alert('Missing credentials', 'Please enter both email and password to log in.');
-        return;
-      }
-
-      await loginUser(email, password);
-      // on success, App.js Hub listener or currentAuthenticatedUser check will route
-     } catch (err) {
-       console.error('Login error:', err);
-       const errorMsg = err.message || err || 'Login failed';
-       const details = err.code ? ` (${err.code})` : "";
-       Alert.alert('Login failed', errorMsg + details);
+      // Open Amplify Hosted UI (configured via amplifyConfig / aws-exports)
+      await Auth.federatedSignIn();
+      // After redirect/sign-in completes Amplify will emit an auth event; App.js listens and will navigate.
+    } catch (err) {
+      console.error('Hosted UI login failed:', err);
+      Alert.alert('Login failed', err.message || 'Unable to open hosted sign-in');
     }
   };
 
@@ -223,20 +215,19 @@ const styles = StyleSheet.create({
 
 export default Login;
 /*
-// Example: direct Sign In with Amplify
-// import React from "react";
-// import { View, Button } from "react-native";
-// import { Auth } from "aws-amplify";
-//
-// export default function LoginScreen() {
-//   const login = async () => {
-//     await Auth.signIn('email@example.com', 'password');
-//   };
-//
-//   return (
-//     <View>
-//       <Button title="Login with email" onPress={login} />
-//     </View>
-//   );
-// }
-*/
+// src/screens/LoginScreen.js
+import React from "react";
+import { View, Button } from "react-native";
+import { Auth } from "aws-amplify";
+
+export default function LoginScreen() {
+  const login = async () => {
+    await Auth.federatedSignIn();
+  };
+
+  return (
+    <View>
+      <Button title="Login with Cognito" onPress={login} />
+    </View>
+  );
+}*/

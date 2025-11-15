@@ -1,19 +1,19 @@
-import { Auth } from "aws-amplify";
+import { Auth } from "@aws-amplify/auth";
 
 // debug: log Auth availability at runtime
-console.log('Auth (authControllers.js) imported from aws-amplify:', Auth);
+console.log('Auth (authControllers.js) imported from @aws-amplify/auth:', Auth);
 
 // Sign Up
 export const signupUser = async (userData) => {
-  const { email, password, fullName, phone } = userData || {};
+  const { email, password, fullName } = userData || {};
   try {
     const { user } = await Auth.signUp({
       username: email,
       password,
-      attributes: { email, name: fullName, phone_number: phone },
+      attributes: { email, name: fullName },
     });
     console.log("Signup success:", user);
-    return { message: 'Signup successful. Check your email for the confirmation code.', user };
+    return user;
   } catch (error) {
     console.error("Signup error:", error);
     throw error;
