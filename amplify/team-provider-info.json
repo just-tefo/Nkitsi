@@ -1,0 +1,30 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-nkitsi-dev-d0063-authRole",
+      "UnauthRoleArn": "arn:aws:iam::501557777582:role/amplify-nkitsi-dev-d0063-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::501557777582:role/amplify-nkitsi-dev-d0063-authRole",
+      "Region": "eu-north-1",
+      "DeploymentBucketName": "amplify-nkitsi-dev-d0063-deployment",
+      "UnauthRoleName": "amplify-nkitsi-dev-d0063-unauthRole",
+      "StackName": "amplify-nkitsi-dev-d0063",
+      "StackId": "arn:aws:cloudformation:eu-north-1:501557777582:stack/amplify-nkitsi-dev-d0063/6b26d5b0-c071-11f0-956e-0ea2fec12041",
+      "AmplifyAppId": "d7czlu4622zs",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-nkitsi-dev-d0063-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
+    },
+    "categories": {
+      "auth": {
+        "nkitsief088665": {}
+      },
+      "function": {
+        "nkitsief088665CustomMessage": {
+          "REDIRECTURL": "nkitsi://callback",
+          "EMAILSUBJECT": "Nkitsi Signup Confirmation",
+          "EMAILMESSAGE": "Welcome to Unimaps! 🎉Please confirm your email ",
+          "deploymentBucketName": "amplify-nkitsi-dev-d0063-deployment",
+          "s3Key": "amplify-builds/nkitsief088665CustomMessage-594b314d6d5653665556-build.zip"
+        }
+      }
+    }
+  }
+}

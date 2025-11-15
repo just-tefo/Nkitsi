@@ -26,6 +26,7 @@ const MyDocuments = ({ documents }) => {
 
   return (
     <View style={styles.documentsContainer}>
+    <Text style={styles.sectionTitle}>My Documents</Text>
       {documents.length === 0 ? (
         <Text style={styles.emptyText}>No documents uploaded yet.</Text>
       ) : (
@@ -41,7 +42,7 @@ const MyDocuments = ({ documents }) => {
                 <Ionicons
                   name="document-text-outline"
                   size={28}
-                  color="#007AFF"
+                  color="#009688"
                 />
               </View>
               <View style={styles.docInfo}>
@@ -75,6 +76,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     paddingVertical: 32,
   },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 12,
+  },
   documentList: {
     backgroundColor: "#fff",
     borderRadius: 12,
@@ -91,7 +98,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: "#E8F4FF",
+    backgroundColor: "#E0F2F1",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,

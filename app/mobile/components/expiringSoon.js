@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 const ExpiringSoon = ({ documents }) => {
   return (
@@ -17,7 +18,7 @@ const ExpiringSoon = ({ documents }) => {
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.expiringScroll}
       >
-        {documents.map((doc) => (
+          {documents.map((doc) => (
           <TouchableOpacity
             key={doc.id}
             style={styles.expiringCard}
@@ -25,11 +26,32 @@ const ExpiringSoon = ({ documents }) => {
             onPress={() => console.log("View document:", doc.id)}
           >
             <View style={styles.thumbnail}>
-              <Image
-                source={{ uri: doc.thumbnail }}
-                style={styles.thumbnailImage}
-                resizeMode="cover"
-              />
+              {doc.thumbnailLocal ? (
+                <Image
+                  source={doc.thumbnailLocal}
+                  style={styles.thumbnailImage}
+                  resizeMode="cover"
+                />
+              ) : doc.thumbnail ? (
+                // support both remote URIs (string) and local require() (number)
+                typeof doc.thumbnail === "number" ? (
+                  <Image
+                    source={doc.thumbnail}
+                    style={styles.thumbnailImage}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <Image
+                    source={{ uri: doc.thumbnail }}
+                    style={styles.thumbnailImage}
+                    resizeMode="cover"
+                  />
+                )
+              ) : (
+                <View style={styles.fallbackIconWrapper}>
+                  <Ionicons name="document-text-outline" size={32} color="#999" />
+                </View>
+              )}
             </View>
             <View style={styles.cardInfo}>
               <Text style={styles.docName} numberOfLines={1}>
@@ -56,6 +78,7 @@ const styles = StyleSheet.create({
   },
   expiringScroll: {
     paddingRight: 16,
+    paddingBottom: 12, // avoid being visually cut off by bottom nav
   },
   expiringCard: {
     width: 140,
@@ -71,18 +94,32 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.1,
     shadowRadius: 2,
+    marginVertical: 8,
+    minHeight: 140,
   },
   thumbnail: {
     width: "100%",
     height: 100,
     backgroundColor: "#f5f5f5",
+    overflow: "hidden",
   },
   thumbnailImage: {
     width: "100%",
-    height: "100%",
+    // make the image taller than the container and position it so the top half is visible
+    height: 200,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+  },
+  fallbackIconWrapper: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   cardInfo: {
     padding: 12,
+    paddingBottom: 16,
   },
   docName: {
     fontSize: 14,

@@ -28,7 +28,7 @@ const NavBar = ({ activeTab, onNavigate }) => {
             <Ionicons
               name={isActive ? tab.activeIcon : tab.icon}
               size={24}
-              color={isActive ? "#007AFF" : "#999"}
+              color={isActive ? "#009688" : "#999"}
             />
             <Text style={[styles.navLabel, isActive && styles.navLabelActive]}>
               {tab.label}
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   navLabelActive: {
-    color: "#007AFF",
+    color: "#009688",
     fontWeight: "600",
   },
 });

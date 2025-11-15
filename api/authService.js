@@ -1,11 +1,11 @@
 import { Auth } from "aws-amplify";
 
-// Opens Cognito Hosted UI in browser
-export const login = async () => {
-  await Auth.federatedSignIn();
+// Sign in with email and password (no Hosted UI)
+export const login = async (email, password) => {
+  return Auth.signIn(email, password);
 };
 
 // Logs out of Cognito session
 export const logout = async () => {
-  await Auth.signOut();
+  return Auth.signOut();
 };

@@ -1,15 +1,19 @@
 import { Auth } from "aws-amplify";
 
+// debug: log Auth availability at runtime
+console.log('Auth (authControllers.js) imported from aws-amplify:', Auth);
+
 // Sign Up
 export const signupUser = async (userData) => {
+  const { email, password, fullName, phone } = userData || {};
   try {
     const { user } = await Auth.signUp({
       username: email,
       password,
-      attributes: { email },
+      attributes: { email, name: fullName, phone_number: phone },
     });
     console.log("Signup success:", user);
-    return user;
+    return { message: 'Signup successful. Check your email for the confirmation code.', user };
   } catch (error) {
     console.error("Signup error:", error);
     throw error;
@@ -31,10 +35,14 @@ export const confirmSignup = async (email, code) => {
 export const loginUser = async (email, password) => {
   try {
     const user = await Auth.signIn(email, password);
+    // get session tokens (access/refresh/id)
+    const session = await Auth.currentSession();
     console.log("Login success:", user);
-    return user;
+    return { user, session };
   } catch (error) {
     console.error("Login error:", error);
-    throw error;
+    // Normalize error
+    const message = error?.message || error || 'Login failed';
+    throw new Error(message);
   }
 };

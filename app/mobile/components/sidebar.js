@@ -2,11 +2,14 @@ import React, { useEffect, useRef } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Animated, Dimensions, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { navigate } from "../services/navigationService";
 
 const { width: screenWidth } = Dimensions.get("window");
 const SIDEBAR_WIDTH = 280;
 
 const Sidebar = ({ isOpen, onClose }) => {
+  // Use the navigation helper so this component can live outside the NavigationContainer
+  // (rendered at the app root). Avoids hook errors when not inside a navigator.
   const slideAnim = useRef(new Animated.Value(SIDEBAR_WIDTH)).current;
   const overlayAnim = useRef(new Animated.Value(0)).current;
 
@@ -44,11 +47,16 @@ const Sidebar = ({ isOpen, onClose }) => {
           </View>
 
           <View style={styles.topMenu}>
-            <TouchableOpacity style={styles.menuItem} onPress={() => { console.log("My Account"); onClose(); }}>
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => {
+                navigate("MyAccount");
+                onClose();
+              }}
+            >
               <Ionicons name="person-outline" size={20} color="#333" />
               <Text style={styles.menuText}>My Account</Text>
             </TouchableOpacity>
-
             <TouchableOpacity style={styles.menuItem} onPress={() => { console.log("Blockchain & Security"); onClose(); }}>
               <Ionicons name="shield-checkmark-outline" size={20} color="#333" />
               <Text style={styles.menuText}>Blockchain & Security</Text>

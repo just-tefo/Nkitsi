@@ -18,6 +18,7 @@ import CountryPicker from "react-native-country-picker-modal";
 const Signup = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const [countryCode, setCountryCode] = useState("US");
   const [callingCode, setCallingCode] = useState("1");
@@ -69,6 +70,11 @@ const Signup = ({ navigation }) => {
       return;
     }
 
+    if (!formData.phone.trim()) {
+      Alert.alert("Error", "Please enter your phone number");
+      return;
+    }
+
     // Password strength validation
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
     if (!passwordRegex.test(formData.password)) {
@@ -81,44 +87,32 @@ const Signup = ({ navigation }) => {
 
     // ... after validation
     console.log('Form Data:', formData);
-    console.log('Full Phone:', fullPhone);
 
     try {
       setLoading(true);
 
       // Format phone number with country code
-      const fullPhone = formData.phone 
-        ? `+${callingCode}${formData.phone}` 
-        : "";
+      const fullPhone = formData.phone ? `+${callingCode}${formData.phone}` : "";
 
       // Call controller to handle signup
-      const result = await signupUser({
-        ...formData,
-        phone: fullPhone,
-      });
+      const result = await signupUser({ ...formData, phone: fullPhone });
 
       // Show success message
-      Alert.alert(
-        "Success! 🎉",
-        result.message,
-        [
-          {
-            text: "OK",
-            onPress: () => {
-              // Navigate to confirmation screen with email
-              navigation.navigate("ConfirmSignup", { 
-                email: formData.email 
-              });
-            },
+      Alert.alert("Success! 🎉", result.message, [
+        {
+          text: "OK",
+          onPress: () => {
+            // Navigate to confirmation screen with email
+            navigation.navigate("ConfirmSignup", { email: formData.email });
           },
-        ]
-      );
+        },
+      ]);
     } catch (error) {
-      // Show error message
-      Alert.alert(
-        "Signup Failed",
-        error.message || "An error occurred during signup. Please try again."
-      );
+      // Show error message from Amplify with details
+      const errorMsg = error.message || error || "An error occurred during signup. Please try again.";
+      const details = error.code ? ` (${error.code})` : "";
+      Alert.alert("Signup Failed", errorMsg + details);
+      console.error('Signup error details:', error);
     } finally {
       setLoading(false);
     }
@@ -131,7 +125,7 @@ const Signup = ({ navigation }) => {
           {/* Logo */}
           <View style={styles.logoWrapper}>
             <Image
-              source={require("../../../assets/logo.png")}
+              source={require("../../../assets/Nkitsi_logo.png")}
               style={styles.logoImage}
               resizeMode="contain"
             />
@@ -352,13 +346,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  checkboxChecked: { backgroundColor: "#007AFF", borderColor: "#007AFF" },
+  checkboxChecked: { backgroundColor: "#009688", borderColor: "#009688" },
   consentText: { flex: 1, fontSize: 14, color: "#666", lineHeight: 20 },
-  link: { color: "#007AFF", textDecorationLine: "underline" },
+  link: { color: "#009688", textDecorationLine: "underline" },
   signupButton: {
     width: "100%",
     height: 50,
-    backgroundColor: "#007AFF",
+    backgroundColor: "#009688",
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
@@ -367,7 +361,7 @@ const styles = StyleSheet.create({
   signupButtonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
   loginRow: { flexDirection: "row", justifyContent: "center", alignItems: "center" },
   loginText: { fontSize: 14, color: "#666" },
-  loginLink: { fontSize: 14, color: "#007AFF", textDecorationLine: "underline" },
+  loginLink: { fontSize: 14, color: "#009688", textDecorationLine: "underline" },
 });
 
 export default Signup;

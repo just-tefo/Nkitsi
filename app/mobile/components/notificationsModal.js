@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,41 +7,62 @@ import {
   Modal,
   ScrollView,
   Pressable,
+  Animated,
+  Dimensions,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-const NotificationsModal = ({
-  isOpen,
-  onClose,
-  notifications,
-  onSeeDetails,
-}) => {
+const { height: screenHeight } = Dimensions.get("window");
+
+const NotificationsModal = ({ isOpen, onClose, notifications, onSeeDetails }) => {
+  const slideAnim = useRef(new Animated.Value(-screenHeight)).current; // start off-screen
+  const opacityAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (isOpen) {
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: -screenHeight,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [isOpen]);
+
   return (
-    <Modal
-      visible={isOpen}
-      transparent={true}
-      animationType="fade"
-      onRequestClose={onClose}
-    >
+    <Modal visible={isOpen} transparent animationType="none" onRequestClose={onClose}>
       {/* Overlay */}
       <Pressable style={styles.modalOverlay} onPress={onClose}>
-        {/* Modal */}
-        <Pressable style={styles.notificationsModal} onPress={(e) => e.stopPropagation()}>
+        <Animated.View style={[styles.notificationsModal, { transform: [{ translateY: slideAnim }], opacity: opacityAnim }]}>
+          {/* Header */}
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Notifications</Text>
-            <TouchableOpacity
-              style={styles.closeBtn}
-              onPress={onClose}
-              activeOpacity={0.7}
-            >
+            <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
               <Ionicons name="close" size={24} color="#333" />
             </TouchableOpacity>
           </View>
 
-          <ScrollView
-            style={styles.modalContent}
-            showsVerticalScrollIndicator={false}
-          >
+          {/* Content */}
+          <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
             {notifications.length === 0 ? (
               <Text style={styles.noNotifications}>
                 No business requests at the moment.
@@ -50,7 +71,7 @@ const NotificationsModal = ({
               notifications.map((n) => (
                 <View key={n.id} style={styles.notificationItem}>
                   <View style={styles.iconContainer}>
-                    <Ionicons name="business-outline" size={24} color="#007AFF" />
+                    <Ionicons name="business-outline" size={24} color="#009688" />
                   </View>
                   <View style={styles.notificationText}>
                     <Text style={styles.businessName}>{n.businessName}</Text>
@@ -59,7 +80,6 @@ const NotificationsModal = ({
                   <TouchableOpacity
                     style={styles.seeDetailsBtn}
                     onPress={() => onSeeDetails(n.id)}
-                    activeOpacity={0.7}
                   >
                     <Text style={styles.seeDetailsBtnText}>See Details</Text>
                   </TouchableOpacity>
@@ -67,7 +87,7 @@ const NotificationsModal = ({
               ))
             )}
           </ScrollView>
-        </Pressable>
+        </Animated.View>
       </Pressable>
     </Modal>
   );
@@ -76,94 +96,71 @@ const NotificationsModal = ({
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    backgroundColor: "rgba(0,0,0,0.5)",
     justifyContent: "flex-start",
-    alignItems: "flex-end",
+    alignItems: "center",
+    paddingTop: 60,
   },
   notificationsModal: {
-    width: 320,
+    width: "90%",
     maxHeight: "80%",
     backgroundColor: "#fff",
-    marginTop: 60,
-    marginRight: 16,
-    borderRadius: 12,
-    elevation: 5,
+    borderRadius: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    elevation: 6,
     shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   modalHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: "#e5e5e5",
+    marginBottom: 12,
   },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#333",
-  },
-  closeBtn: {
-    padding: 4,
-  },
-  modalContent: {
-    maxHeight: 400,
-  },
+  modalTitle: { fontSize: 20, fontWeight: "bold", color: "#333" },
+  closeBtn: { padding: 4 },
+  modalContent: { paddingBottom: 8 },
   noNotifications: {
     textAlign: "center",
     color: "#999",
     fontSize: 14,
     paddingVertical: 32,
-    paddingHorizontal: 16,
   },
   notificationItem: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
+    backgroundColor: "#F9F9F9",
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: "#E8F4FF",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: "#E0F2F1",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
   },
-  notificationText: {
-    flex: 1,
-  },
-  businessName: {
-    fontSize: 15,
-    fontWeight: "600",
-    color: "#333",
-    marginBottom: 4,
-  },
-  requestedAt: {
-    fontSize: 12,
-    color: "#666",
-  },
+  notificationText: { flex: 1 },
+  businessName: { fontSize: 16, fontWeight: "600", color: "#333", marginBottom: 2 },
+  requestedAt: { fontSize: 12, color: "#666", fontStyle: "italic" },
   seeDetailsBtn: {
-    backgroundColor: "#007AFF",
+    backgroundColor: "#009688",
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 6,
+    borderRadius: 8,
   },
-  seeDetailsBtnText: {
-    color: "#fff",
-    fontSize: 12,
-    fontWeight: "600",
-  },
+  seeDetailsBtnText: { color: "#fff", fontSize: 12, fontWeight: "600" },
 });
 
-export default NotificationsModal
+export default NotificationsModal;

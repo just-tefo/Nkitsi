@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import {
   View,
   Text,
@@ -9,6 +10,16 @@ import {
 } from "react-native";
 
 const MyNetwork = ({ companies, onSelectCompany }) => {
+  const [logoErrorMap, setLogoErrorMap] = useState({});
+
+  const handleLogoError = (id) => {
+    setLogoErrorMap((prev) => ({ ...prev, [id]: true }));
+  };
+
+  const handleLogoLoad = (id) => {
+    setLogoErrorMap((prev) => ({ ...prev, [id]: false }));
+  };
+
   return (
     <View style={styles.networkContainer}>
       {companies.length === 0 ? (
@@ -29,11 +40,28 @@ const MyNetwork = ({ companies, onSelectCompany }) => {
               activeOpacity={0.7}
             >
               <View style={styles.logoContainer}>
-                <Image
-                  source={{ uri: company.logoUrl }}
-                  style={styles.companyLogo}
-                  resizeMode="contain"
-                />
+                {company.logoUrl && !logoErrorMap[company.id] ? (
+                  // support local require() (number) or remote uri (string)
+                  typeof company.logoUrl === "number" ? (
+                    <Image
+                      source={company.logoUrl}
+                      style={styles.companyLogo}
+                      resizeMode="contain"
+                      onError={() => handleLogoError(company.id)}
+                      onLoad={() => handleLogoLoad(company.id)}
+                    />
+                  ) : (
+                    <Image
+                      source={{ uri: company.logoUrl }}
+                      style={styles.companyLogo}
+                      resizeMode="contain"
+                      onError={() => handleLogoError(company.id)}
+                      onLoad={() => handleLogoLoad(company.id)}
+                    />
+                  )
+                ) : (
+                  <Ionicons name="business-outline" size={32} color="#009688" />
+                )}
               </View>
               <Text style={styles.companyName} numberOfLines={2}>
                 {company.name}
@@ -64,6 +92,7 @@ const styles = StyleSheet.create({
   },
   networkScroll: {
     paddingRight: 16,
+    paddingBottom: 12, // provide space so cards don't get visually clipped by bottom nav
   },
   networkCard: {
     width: 140,
@@ -80,6 +109,8 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.1,
     shadowRadius: 2,
+    marginVertical: 8,
+    minHeight: 140,
   },
   logoContainer: {
     width: 60,

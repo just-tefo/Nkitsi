@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Text,
@@ -8,15 +8,15 @@ import {
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useRoute } from '@react-navigation/native';
 import { Ionicons } from "@expo/vector-icons";
 
 // Import your components (we'll create these next)
-import Header from "../components/header";
-import Sidebar from "../components/sidebar";
-import NavBar from "../components/navbar";
+// Header, Sidebar and NavBar are now rendered at the app root to be persistent across screens
 import ExpiringSoon from "../components/expiringSoon";
 import MyDocuments from "../components/documents";
 import MyNetwork from "../components/network";
+import { navigate } from "../services/navigationService";
 
 // Custom hook for header controller logic
 const useHeaderController = () => {
@@ -32,7 +32,7 @@ const useHeaderController = () => {
   };
 
   const handleNotificationClick = () => {
-    Alert.alert("Notifications", "You have new notifications!");
+    //lert.alert("Notifications", "You have new notifications!");
     setHasNotifications(false);
   };
 
@@ -55,6 +55,22 @@ const Homepage = () => {
   } = useHeaderController();
 
   const [activeTab, setActiveTab] = useState("home");
+  const scrollRef = useRef(null);
+  const route = useRoute();
+
+  useEffect(() => {
+    const tab = route?.params?.tab;
+    if (tab) {
+      setActiveTab(tab);
+      // if user requested the network tab, scroll to bottom where the network section is
+      if (tab === 'network' && scrollRef.current) {
+        // small timeout to allow layout
+        setTimeout(() => {
+          scrollRef.current.scrollToEnd({ animated: true });
+        }, 300);
+      }
+    }
+  }, [route]);
 
   // Mock data
   const documents = [
@@ -62,12 +78,15 @@ const Homepage = () => {
       id: "1",
       name: "National ID.pdf",
       thumbnail: "/assets/id-thumb.jpg",
+      // local first-page thumbnail you added
+      thumbnailLocal: require("../../../assets/thumbnails/ID.jpeg"),
       expiresIn: "Expiring in 6 days",
     },
     {
       id: "2",
       name: "Driver's License.png",
       thumbnail: "/assets/license-thumb.jpg",
+      thumbnailLocal: require("../../../assets/thumbnails/doc1-page1.jpg"),
       expiresIn: "Expiring in 1 week",
     },
     {
@@ -85,6 +104,7 @@ const Homepage = () => {
       type: "PDF Document",
       updatedAt: "2 days ago",
       fileUrl: "/assets/id.pdf",
+      thumbnailLocal: require("../../../assets/thumbnails/doc1-page1.jpg"),
     },
     {
       id: "2",
@@ -92,25 +112,26 @@ const Homepage = () => {
       type: "Image",
       updatedAt: "5 days ago",
       fileUrl: "/assets/license.png",
+      thumbnailLocal: require("../../../assets/thumbnails/doc1-page1.jpg"),
     },
   ];
 
   const mockCompanies = [
     {
       id: "1",
-      name: "Stanbic Bank",
+      name: "Orange Botswana",
       logoUrl: "/assets/stanbic.png",
       lastShared: "2 weeks ago",
     },
     {
       id: "2",
-      name: "Botswana Life",
+      name: "First National Bank",
       logoUrl: "/assets/botswanalife.png",
       lastShared: "1 month ago",
     },
     {
       id: "3",
-      name: "Orange Botswana",
+      name: "Bomaid",
       logoUrl: "/assets/orange.png",
       lastShared: "3 months ago",
     },
@@ -126,18 +147,9 @@ const Homepage = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Fixed header */}
-      <Header
-        onProfileClick={toggleSidebar}
-        onNotificationClick={handleNotificationClick}
-        hasNotifications={hasNotifications}
-      />
-
-      {/* Sidebar overlay */}
-      <Sidebar isOpen={isSidebarOpen} onClose={closeSidebar} />
-
-      {/* Scrollable main content */}
+      {/* Scrollable main content only - header/nav are app-level */}
       <ScrollView
+        ref={scrollRef}
         style={styles.content}
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
@@ -145,7 +157,7 @@ const Homepage = () => {
         <View style={styles.homeContainer}>
           <ExpiringSoon documents={documents} />
           <MyDocuments documents={mockDocuments} />
-          
+
           <Text style={styles.sectionTitle}>My KYC Network</Text>
           <MyNetwork
             companies={mockCompanies}
@@ -153,18 +165,6 @@ const Homepage = () => {
           />
         </View>
       </ScrollView>
-
-      {/* Fixed bottom navbar */}
-      <NavBar activeTab={activeTab} onNavigate={setActiveTab} />
-
-      {/* Floating share button */}
-      <TouchableOpacity
-        style={styles.shareFab}
-        onPress={handleShare}
-        activeOpacity={0.8}
-      >
-        <Ionicons name="share-outline" size={24} color="#fff" />
-      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -184,11 +184,10 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
     color: "#333",
-    marginTop: 24,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   shareFab: {
     position: "absolute",
@@ -197,7 +196,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: "#007AFF",
+    backgroundColor: "#009688",
     justifyContent: "center",
     alignItems: "center",
     elevation: 5,

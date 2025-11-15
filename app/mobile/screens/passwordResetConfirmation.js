@@ -17,7 +17,7 @@ const PasswordResetConfirmation = ({ navigation }) => {
           {/* Logo */}
           <View style={styles.logoContainer}>
             <Image
-              source={require("../../../assets/logo.png")}
+              source={require("../../../assets/Nkitsi_logo.png")}
               style={styles.logoImage}
               resizeMode="contain"
             />
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
   primaryButton: {
     width: "100%",
     height: 50,
-    backgroundColor: "#007AFF",
+    backgroundColor: "#009688",
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",

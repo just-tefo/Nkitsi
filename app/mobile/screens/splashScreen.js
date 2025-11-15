@@ -5,8 +5,8 @@ import { View, Image, StyleSheet } from "react-native";
 const SplashScreen = ({ navigation }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
-      navigation.replace("Login"); // Navigate to Login after splash
-    }, 2000); // 2-second splash
+      navigation.replace("Login");
+    }, 3000); 
 
     return () => clearTimeout(timer);
   }, []);
@@ -14,7 +14,7 @@ const SplashScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../../../assets/logo.png")}
+        source={require("../../../assets/Nkitsi_logo.png")}
         style={styles.logo}
         resizeMode="contain"
       />

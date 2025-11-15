@@ -9,7 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import NotificationsModal from "./notificationsModal";
 
 // Import your logo
-// import Logo from "../../assets/logo.png";
+// import Logo from "../../assets/Nkitsi_logo.png";
 
 const Header = ({
   onProfileClick,
@@ -44,7 +44,7 @@ const Header = ({
       {/* Centered Logo */}
       <View style={styles.logoContainer}>
         <Image
-          source={require("../../../assets/logo.png")}
+          source={require("../../../assets/Nkitsi_logo.png")}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -104,13 +104,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logoContainer: {
-    flex: 2,
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
   },
   logo: {
-    width: 80,
-    height: 40,
+    // allow a larger visible logo while keeping it inside the 60px header
+    width: 190,
+    height: 80,
+    resizeMode: "contain",
   },
   rightIcons: {
     flex: 1,
